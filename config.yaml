@@ -1,0 +1,7 @@
+estimator:
+  command:
+    cmd: "vnstat"
+    # args: ["-i", "eth0", "-t", "--oneline", "b"]
+    args: ["-i", "usb0", "-t", "--oneline", "b"]
+  rxPattern: ""
+  txPattern: ""
