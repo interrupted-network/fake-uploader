@@ -1,20 +1,15 @@
 package usecase
 
-import "regexp"
-
 type config struct {
 	Command struct {
-		CMD  string
+		Name string
 		Args []string
 	}
-	RxPattern string
-	TxPattern string
-
-	rxPattern *regexp.Regexp
-	txPattern *regexp.Regexp
+	InterfaceName string
 }
 
 func (c *config) initialize() {
-	c.rxPattern = regexp.MustCompile(c.RxPattern)
-	c.txPattern = regexp.MustCompile(c.TxPattern)
+	if c.InterfaceName == "" {
+		panic("interface name can not be empty")
+	}
 }
