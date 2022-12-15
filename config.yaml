@@ -11,3 +11,4 @@ coordinator:
     max: 102400
   interval: 3s
   concurrent: 10
+  rxTxMaxRatio: 0.10

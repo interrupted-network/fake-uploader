@@ -17,6 +17,7 @@ func (uc *useCase) Process() error {
 	uc.logger.DebugF("estimated. Rx: %s, Tx: %s, Ratio: %f",
 		byteCountIEC(estimated.Rx), byteCountIEC(estimated.Tx), estimated.RxTxRatio)
 
+	var totalSent int64 = 0
 	if estimated.RxTxRatio > uc.config.RxTxMaxRatio {
 		var wg sync.WaitGroup
 		for i := 0; i < int(uc.config.Concurrent); i++ {
@@ -31,12 +32,12 @@ func (uc *useCase) Process() error {
 					uc.logger.DebugF("error while uploading. error: %v", err)
 				}
 				if result != nil {
-					uc.logger.DebugF("%s: %s sent",
-						byteCountIEC(result.SentLen), result.Address)
+					totalSent += result.SentLen
 				}
 			}()
 		}
 		wg.Wait()
+		uc.logger.DebugF("%s sent", byteCountIEC(totalSent))
 	}
 	return nil
 }
