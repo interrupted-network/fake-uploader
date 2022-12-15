@@ -10,6 +10,8 @@ func (a *app) initializeModules() {
 	a.initializeEstimator()
 	a.initializeUploader()
 	a.initializeCoordinator()
+
+	a.uploader.UseCase.Initialize(a.coordinator.UseCase.GetMessageQueue())
 }
 
 func (a *app) initializeEstimator() {

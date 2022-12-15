@@ -12,6 +12,8 @@ type useCase struct {
 	logger log.Logger
 	config config
 
+	msgQueue chan []byte
+
 	estimator estimator.UseCase
 	uploader  uploader.UseCase
 
@@ -30,5 +32,11 @@ func New(logger log.Logger, registry *viper.Viper,
 		panic(err)
 	}
 	uc.config.initialize()
+
+	uc.msgQueue = make(chan []byte, uc.config.Concurrent)
 	return uc
+}
+
+func (uc *useCase) GetMessageQueue() chan []byte {
+	return uc.msgQueue
 }

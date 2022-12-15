@@ -9,11 +9,14 @@ import (
 type useCase struct {
 	logger log.Logger
 	config config
+
+	clients []*client
 }
 
 func New(logger log.Logger, registry *viper.Viper) uploader.UseCase {
 	uc := &useCase{
-		logger: logger,
+		logger:  logger,
+		clients: make([]*client, 0),
 	}
 
 	if err := registry.Unmarshal(&uc.config); err != nil {
@@ -21,4 +24,16 @@ func New(logger log.Logger, registry *viper.Viper) uploader.UseCase {
 	}
 	uc.config.initialize()
 	return uc
+}
+
+func (uc *useCase) Initialize(msgQueue <-chan []byte) {
+	for _, target := range uc.config.Targets {
+		uc.clients = append(uc.clients, newClient(uc.logger, target, msgQueue))
+	}
+}
+
+func (uc *useCase) Start() {
+	for _, c := range uc.clients {
+		c.Start()
+	}
 }

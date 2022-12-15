@@ -7,6 +7,7 @@ import (
 )
 
 func (a *app) Start() {
+	a.uploader.UseCase.Start()
 	a.coordinator.UseCase.Start()
 
 	done := make(chan struct{})

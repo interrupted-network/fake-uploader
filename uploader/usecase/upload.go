@@ -4,30 +4,36 @@ import (
 	"context"
 	"math/rand"
 	"net"
+	"time"
 
 	"github.com/interrupted-network/fake-uploader/uploader/domain/uploader"
 )
 
-func (uc *useCase) UploadRandomTarget(ctx context.Context,
+func (uc *useCase) Upload(ctx context.Context,
 	size uint) (*uploader.Result, error) {
 	target := uc.config.Targets[rand.Intn(len(uc.config.Targets))]
 	request := &uploader.Request{
-		Network: target.Network,
-		Address: target.Address,
-		Size:    size,
+		Target: target,
+		Size:   size,
 	}
-	return uc.Upload(ctx, request)
+	return uc.upload(ctx, request)
 }
 
-func (uc *useCase) Upload(ctx context.Context,
+func (uc *useCase) upload(ctx context.Context,
 	request *uploader.Request) (*uploader.Result, error) {
 	uc.logger.DebugF("connecting %s(%s)...",
-		request.Address, request.Network)
-	conn, err := net.Dial(request.Network, request.Address)
+		request.Target.Address, request.Target.Network)
+	conn, err := net.DialTimeout(
+		request.Target.Network,
+		request.Target.Address,
+		request.Target.DialTimeout,
+	)
 	if err != nil {
 		return nil, err
 	}
-	uc.logger.DebugF("%s: connected", request.Address)
+	uc.logger.DebugF("%s: connected", request.Target.Address)
+
+	conn.SetDeadline(time.Now().Add(request.Target.RWTimeout))
 
 	bytes := make([]byte, 1024*1024)
 	result := new(uploader.Result)
