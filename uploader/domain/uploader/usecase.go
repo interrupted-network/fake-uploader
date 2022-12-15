@@ -3,5 +3,6 @@ package uploader
 import "context"
 
 type UseCase interface {
-	Upload(ctx context.Context, request *Request) error
+	UploadRandomTarget(ctx context.Context, size uint) (*Result, error)
+	Upload(ctx context.Context, request *Request) (*Result, error)
 }

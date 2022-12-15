@@ -4,6 +4,7 @@ import (
 	l "log"
 	"os"
 
+	"github.com/interrupted-network/fake-uploader/coordinator"
 	"github.com/interrupted-network/fake-uploader/estimator"
 	"github.com/interrupted-network/fake-uploader/log"
 	"github.com/interrupted-network/fake-uploader/uploader"
@@ -19,8 +20,9 @@ type app struct {
 	logger log.Logger
 	viper  *viper.Viper
 
-	estimator *estimator.Module
-	uploader  *uploader.Module
+	estimator   *estimator.Module
+	uploader    *uploader.Module
+	coordinator *coordinator.Module
 }
 
 func New() Application {

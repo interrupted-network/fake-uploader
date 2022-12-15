@@ -4,4 +4,10 @@ estimator:
 uploader:
   targets:
     - network: tcp
-      address: 127.0.0.1:80
+      address: 1.2.3.4:443
+coordinator:
+  uploadSize:
+    min: 1024
+    max: 102400
+  interval: 3s
+  concurrent: 100
