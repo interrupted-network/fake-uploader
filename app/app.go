@@ -6,6 +6,7 @@ import (
 
 	"github.com/interrupted-network/fake-uploader/estimator"
 	"github.com/interrupted-network/fake-uploader/log"
+	"github.com/interrupted-network/fake-uploader/uploader"
 	"github.com/spf13/viper"
 )
 
@@ -19,6 +20,7 @@ type app struct {
 	viper  *viper.Viper
 
 	estimator *estimator.Module
+	uploader  *uploader.Module
 }
 
 func New() Application {
