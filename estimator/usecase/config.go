@@ -1,10 +1,6 @@
 package usecase
 
 type config struct {
-	Command struct {
-		Name string
-		Args []string
-	}
 	InterfaceName string
 }
 
