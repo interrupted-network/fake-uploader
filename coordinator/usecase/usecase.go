@@ -17,7 +17,8 @@ type useCase struct {
 	estimator estimator.UseCase
 	uploader  uploader.UseCase
 
-	started bool
+	started         bool
+	isUploadStarted bool
 }
 
 func New(logger log.Logger, registry *viper.Viper,

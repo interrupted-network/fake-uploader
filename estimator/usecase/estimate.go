@@ -84,6 +84,6 @@ func (uc *useCase) Estimate() (*estimator.Result, error) {
 		Rx: interface0.Traffic.Total.Rx,
 		Tx: interface0.Traffic.Total.Tx,
 	}
-	result.RxTxRatio = float32(float64(result.Rx) / float64(result.Tx))
+	result.TxRxRatio = float32(float64(result.Tx) / float64(result.Rx))
 	return result, nil
 }

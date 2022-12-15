@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"time"
+
 	"github.com/interrupted-network/fake-uploader/log"
 	"github.com/interrupted-network/fake-uploader/uploader/domain/uploader"
 	"github.com/spf13/viper"
@@ -35,5 +37,19 @@ func (uc *useCase) Initialize(msgQueue <-chan []byte) {
 func (uc *useCase) Start() {
 	for _, c := range uc.clients {
 		c.Start()
+	}
+	go uc.start()
+}
+
+func (uc *useCase) start() {
+	for {
+		numAlive := 0
+		for _, c := range uc.clients {
+			if c.isConnected {
+				numAlive++
+			}
+		}
+		uc.logger.DebugF("alive connections: %d", numAlive)
+		time.Sleep(time.Second * 10)
 	}
 }

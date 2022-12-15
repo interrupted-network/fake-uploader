@@ -1,17 +1,20 @@
 estimator:
-  interfaceName: ens160
+  # interfaceName: ens160
   # interfaceName: eth0
   # interfaceName: usb0
+  # interfaceName: enp44s0
+  interfaceName: wlo1
 uploader:
   targets:
     - network: tcp
       address: 1.2.3.4:443
     - network: tcp
-      address: 5.4.3.2:443
+      address: 5.6.7.8:443a
 coordinator:
   uploadSize:
     min: 1024000
     max: 102400000
   interval: 1s
-  concurrent: 100
-  rxTxMaxRatio: 0.09
+  concurrent: 10
+  txRxMinRatio: 10
+  txRxMaxRatio: 15

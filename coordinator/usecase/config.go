@@ -7,7 +7,8 @@ type config struct {
 		Min uint
 		Max uint
 	}
-	RxTxMaxRatio float32
+	TxRxMinRatio float32
+	TxRxMaxRatio float32
 	Interval     time.Duration
 	Concurrent   int
 }

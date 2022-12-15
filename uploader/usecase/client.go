@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"net"
+	"sync"
 	"time"
 
 	"github.com/interrupted-network/fake-uploader/log"
@@ -10,11 +11,13 @@ import (
 
 type client struct {
 	net.Conn
+	isConnected bool
+	connMtx     *sync.Mutex
+
 	logger   log.Logger
 	msgQueue <-chan []byte
 	target   *uploader.Target
 
-	sleepChan     <-chan bool
 	sleepDuration time.Duration
 	started       bool
 }
@@ -22,6 +25,7 @@ type client struct {
 func newClient(logger log.Logger,
 	target *uploader.Target, msgQueue <-chan []byte) *client {
 	c := &client{
+		connMtx:       new(sync.Mutex),
 		logger:        logger,
 		msgQueue:      msgQueue,
 		target:        target,
@@ -41,7 +45,7 @@ func (c *client) Start() {
 
 func (c *client) checkLiveness() {
 	for c.started {
-		if c.Conn == nil {
+		if !c.isConnected {
 			var err error
 			c.Conn, err = net.DialTimeout(
 				c.target.Network,
@@ -50,20 +54,27 @@ func (c *client) checkLiveness() {
 			)
 			if err != nil {
 				c.errored(err)
+				c.logger.ErrorF("error on connect: %v", err)
 				time.Sleep(c.sleepDuration)
 				continue
 			}
+			c.isConnected = true
 		}
 		time.Sleep(time.Second)
 	}
 }
 
 func (c *client) errored(err error) {
-	c.Conn = nil
+	c.connMtx.Lock()
+	defer c.connMtx.Unlock()
 	if c.sleepDuration < time.Minute*10 {
 		c.sleepDuration *= 2
 	}
 	time.Sleep(c.sleepDuration)
+	if !c.isConnected {
+		return
+	}
+	c.isConnected = false
 }
 
 func (c *client) start() {
@@ -76,6 +87,7 @@ func (c *client) start() {
 		_, err := c.Write(msg)
 		if err != nil {
 			c.errored(err)
+			c.logger.ErrorF("error on write: %v", err)
 			continue
 		}
 		c.logger.DebugF("%s sent", byteCountIEC(int64(len(msg))))

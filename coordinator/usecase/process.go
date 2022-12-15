@@ -13,13 +13,17 @@ func (uc *useCase) Process() error {
 		return err
 	}
 
-	uc.logger.DebugF("estimated. Rx: %s, Tx: %s, Ratio: %f",
-		byteCountIEC(estimated.Rx), byteCountIEC(estimated.Tx), estimated.RxTxRatio)
+	uc.logger.DebugF("estimated. Tx: %s, Rx: %s, Ratio: %f",
+		byteCountIEC(estimated.Tx), byteCountIEC(estimated.Rx), estimated.TxRxRatio)
 
-	if estimated.RxTxRatio > uc.config.RxTxMaxRatio {
+	if (!uc.isUploadStarted && estimated.TxRxRatio < uc.config.TxRxMinRatio) ||
+		(uc.isUploadStarted && estimated.TxRxRatio < uc.config.TxRxMaxRatio) {
+		uc.isUploadStarted = true
 		for i := 0; i < int(uc.config.Concurrent); i++ {
 			uc.beginUpload()
 		}
+	} else {
+		uc.isUploadStarted = false
 	}
 	return nil
 }
