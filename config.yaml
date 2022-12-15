@@ -10,4 +10,4 @@ coordinator:
     min: 1024
     max: 102400
   interval: 3s
-  concurrent: 100
+  concurrent: 10
