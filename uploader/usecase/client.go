@@ -46,12 +46,14 @@ func (c *client) Start() {
 func (c *client) checkLiveness() {
 	for c.started {
 		if !c.isConnected {
+			c.connMtx.Lock()
 			var err error
 			c.Conn, err = net.DialTimeout(
 				c.target.Network,
 				c.target.Address,
 				c.target.DialTimeout,
 			)
+			c.connMtx.Unlock()
 			if err != nil {
 				c.errored(err)
 				c.logger.ErrorF("error on connect: %v", err)
@@ -79,12 +81,15 @@ func (c *client) errored(err error) {
 
 func (c *client) start() {
 	for c.started {
-		if c.Conn == nil {
+		c.connMtx.Lock()
+		if !c.isConnected {
+			c.connMtx.Unlock()
 			time.Sleep(c.sleepDuration)
 			continue
 		}
 		msg := <-c.msgQueue
 		_, err := c.Write(msg)
+		c.connMtx.Unlock()
 		if err != nil {
 			c.errored(err)
 			c.logger.ErrorF("error on write: %v", err)
