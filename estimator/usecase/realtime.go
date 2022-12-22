@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"os/exec"
 	"strconv"
+	"time"
 
 	"github.com/interrupted-network/fake-uploader/estimator/domain/estimator"
 )
@@ -56,6 +57,7 @@ func (uc *useCase) beginFillChanRealtime() {
 				speed.Rx.ToString(), speed.Tx.ToString())
 			uc.speedChan <- speed
 		}
+		time.Sleep(time.Second)
 	}
 }
 

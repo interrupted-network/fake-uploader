@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"math/rand"
-	"time"
 
 	"github.com/interrupted-network/fake-uploader/uploader/domain/uploader"
 )
@@ -56,8 +55,6 @@ func (uc *useCase) beginProcessRealtimeBalancer() error {
 		}
 		// eg.Wait()
 		// cancelFunc()
-
-		time.Sleep(time.Second)
 	}
 
 	return nil
