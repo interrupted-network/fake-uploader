@@ -11,10 +11,15 @@ uploader:
     - network: tcp
       address: 5.6.7.8:443
 coordinator:
-  uploadSize:
-    min: 1024000
-    max: 102400000
-  interval: 1s
   concurrent: 10
+  # total balancer
+  totalBalancerEnabled: false
+  interval: 1s
+  uploadSize:
+    min: 1024
+    max: 102400
   txRxMinRatio: 10
-  txRxMaxRatio: 15
+  txRxMaxRatio: 11
+  # realtime balancer
+  realtimeBalancerEnabled: true
+  realtimeTxRxRatio: 10
