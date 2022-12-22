@@ -1,10 +1,8 @@
 package usecase
 
 import (
-	"context"
 	"math/rand"
-
-	"github.com/interrupted-network/fake-uploader/uploader/domain/uploader"
+	"time"
 )
 
 func (uc *useCase) beginProcessTotalBalancer() error {
@@ -12,8 +10,12 @@ func (uc *useCase) beginProcessTotalBalancer() error {
 		uc.logger.Debugf("Total balancer disabled")
 		return nil
 	}
-	if err := uc.processTotalBalancer(); err != nil {
-		return err
+
+	for uc.started {
+		if err := uc.processTotalBalancer(); err != nil {
+			return err
+		}
+		time.Sleep(uc.config.Interval)
 	}
 	return nil
 }
@@ -31,30 +33,16 @@ func (uc *useCase) beginProcessRealtimeBalancer() error {
 		if s <= 0 {
 			continue
 		}
+		if s <= 512 {
+			bytes := make([]byte, int(s))
+			uc.msgQueue <- bytes
+			continue
+		}
 		size := int(s) / uc.config.Concurrent
-
-		// ctx, cancelFunc := context.WithTimeout(ctx, time.Second)
-		// eg, _ := errgroup.WithContext(ctx)
-
 		for i := 0; i < uc.config.Concurrent; i++ {
 			bytes := make([]byte, size)
 			uc.msgQueue <- bytes
-			// eg.Go(func() error {
-			// 	req := &uploader.Request{
-			// 		// Deadline: time.Second,
-			// 		Size: uint(size),
-			// 	}
-			// 	_, err := uc.uploader.Upload(ctx, req)
-			// 	if err != nil {
-			// 		// uc.logger.WithPrefix("realtime_balancer.Upload").
-			// 		// 	Errorf("error on upload: %v", err)
-			// 		return err
-			// 	}
-			// 	return nil
-			// })
 		}
-		// eg.Wait()
-		// cancelFunc()
 	}
 
 	return nil
@@ -78,15 +66,6 @@ func (uc *useCase) processTotalBalancer() error {
 		uc.isUploadStarted = false
 	}
 	return nil
-}
-
-func (uc *useCase) upload() (*uploader.Result, error) {
-	size := uint(uc.config.UploadSize.Min) +
-		uint(rand.Intn(int(uc.config.UploadSize.Max)))
-	req := &uploader.Request{
-		Size: uint(size),
-	}
-	return uc.uploader.Upload(context.Background(), req)
 }
 
 func (uc *useCase) beginUpload() {

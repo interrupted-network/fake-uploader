@@ -40,8 +40,8 @@ func (uc *useCase) upload(ctx context.Context,
 		return result, err
 	}
 	result.SentLen = int64(l)
-	if l > 0 {
-		uc.logger.Debugf("sent %s", byteCountIEC(result.SentLen))
-	}
+	// if l > 0 {
+	// 	uc.logger.Debugf("sent %s", byteCountIEC(result.SentLen))
+	// }
 	return result, nil
 }

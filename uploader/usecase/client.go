@@ -45,7 +45,10 @@ func (c *client) Start() {
 }
 
 func (c *client) checkLiveness() {
+	bytes := make([]byte, 1)
 	for c.started {
+		time.Sleep(time.Second)
+
 		if !c.isConnected {
 			c.connMtx.Lock()
 			var err error
@@ -62,22 +65,24 @@ func (c *client) checkLiveness() {
 				continue
 			}
 			c.isConnected = true
+		} else {
+			_, err := c.Write(bytes)
+			if err != nil {
+				c.errored(err)
+				continue
+			}
 		}
-		time.Sleep(time.Second)
 	}
 }
 
 func (c *client) errored(err error) {
+	c.isConnected = false
 	c.connMtx.Lock()
 	defer c.connMtx.Unlock()
 	if c.sleepDuration < time.Minute*10 {
 		c.sleepDuration *= 2
 	}
 	time.Sleep(c.sleepDuration)
-	if !c.isConnected {
-		return
-	}
-	c.isConnected = false
 }
 
 func (c *client) start() {
@@ -94,7 +99,6 @@ func (c *client) start() {
 		if err != nil {
 			continue
 		}
-		c.logger.Debugf("%s sent", byteCountIEC(int64(len(msg))))
 		if c.sleepDuration > time.Second {
 			c.sleepDuration /= 2
 		}

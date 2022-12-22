@@ -100,6 +100,8 @@ func (uc *useCase) getUnitRatio(unit string) int64 {
 		return 1024 * 1024
 	case "GiB/s":
 		return 1024 * 1024 * 1024
+	default:
+		uc.logger.Errorf("unknown unit: %s", unit)
 	}
 	return 0
 }
