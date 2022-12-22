@@ -7,8 +7,8 @@ import (
 
 type Logger interface {
 	WithPrefix(prefix string) Logger
-	DebugF(format string, a ...any)
-	ErrorF(format string, a ...any)
+	Debugf(format string, a ...any)
+	Errorf(format string, a ...any)
 }
 
 type logger struct {
@@ -35,10 +35,10 @@ func (l *logger) WithPrefix(prefix string) Logger {
 	return l
 }
 
-func (l *logger) DebugF(format string, a ...any) {
+func (l *logger) Debugf(format string, a ...any) {
 	l.Println(fmt.Sprintf(format, a...))
 }
 
-func (l *logger) ErrorF(format string, a ...any) {
+func (l *logger) Errorf(format string, a ...any) {
 	l.Println(fmt.Sprintf(format, a...))
 }

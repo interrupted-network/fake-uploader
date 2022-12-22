@@ -1,6 +1,12 @@
 package uploader
 
+import (
+	"net"
+	"time"
+)
+
 type Request struct {
-	Target *Target
-	Size   uint
+	Client   net.Conn
+	Size     uint
+	Deadline time.Duration
 }

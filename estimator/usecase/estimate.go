@@ -68,7 +68,7 @@ func (uc *useCase) Estimate() (*estimator.Result, error) {
 	if err != nil {
 		uc.logger.
 			WithPrefix("Estimate").
-			ErrorF("error on command, err: %v", err)
+			Errorf("error on command, err: %v", err)
 	}
 
 	data := new(data)

@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"net"
 	"sync"
 	"time"
@@ -56,8 +57,8 @@ func (c *client) checkLiveness() {
 			c.connMtx.Unlock()
 			if err != nil {
 				c.errored(err)
-				c.logger.ErrorF("error on connect: %v", err)
-				time.Sleep(c.sleepDuration)
+				// c.logger.Errorf("error on connect: %v", err)
+				// time.Sleep(c.sleepDuration)
 				continue
 			}
 			c.isConnected = true
@@ -91,13 +92,24 @@ func (c *client) start() {
 		_, err := c.Write(msg)
 		c.connMtx.Unlock()
 		if err != nil {
-			c.errored(err)
-			c.logger.ErrorF("error on write: %v", err)
 			continue
 		}
-		c.logger.DebugF("%s sent", byteCountIEC(int64(len(msg))))
+		c.logger.Debugf("%s sent", byteCountIEC(int64(len(msg))))
 		if c.sleepDuration > time.Second {
 			c.sleepDuration /= 2
 		}
 	}
+}
+
+func (c *client) Write(b []byte) (n int, err error) {
+	if c.Conn == nil {
+		return 0, errors.New("client is not initialized")
+	}
+	i, err := c.Conn.Write(b)
+	if err != nil {
+		c.errored(err)
+		c.logger.Errorf("error on write: %v", err)
+		return 0, err
+	}
+	return i, nil
 }

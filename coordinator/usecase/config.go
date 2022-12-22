@@ -7,10 +7,13 @@ type config struct {
 		Min uint
 		Max uint
 	}
-	TxRxMinRatio float32
-	TxRxMaxRatio float32
-	Interval     time.Duration
-	Concurrent   int
+	TotalBalancerEnabled    bool
+	TxRxMinRatio            float32
+	TxRxMaxRatio            float32
+	Interval                time.Duration
+	Concurrent              int
+	RealtimeBalancerEnabled bool
+	RealtimeTxRxRatio       float32
 }
 
 func (c *config) initialize() {
@@ -19,5 +22,8 @@ func (c *config) initialize() {
 	}
 	if c.Concurrent == 0 {
 		c.Concurrent = 1
+	}
+	if c.RealtimeTxRxRatio == 0 {
+		c.Concurrent = 10
 	}
 }

@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"time"
 
 	"github.com/interrupted-network/fake-uploader/log"
@@ -45,11 +46,22 @@ func (uc *useCase) start() {
 	for {
 		numAlive := 0
 		for _, c := range uc.clients {
+			if c == nil || c.Conn == nil {
+				continue
+			}
+			_, err := uc.upload(context.Background(),
+				&uploader.Request{
+					Client:   c,
+					Deadline: time.Millisecond,
+				})
+			if err != nil {
+				continue
+			}
 			if c.isConnected {
 				numAlive++
 			}
 		}
-		uc.logger.DebugF("alive connections: %d", numAlive)
+		uc.logger.Debugf("alive connections: %d", numAlive)
 		time.Sleep(time.Second * 10)
 	}
 }
